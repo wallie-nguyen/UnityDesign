@@ -3,38 +3,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Event bus that allows for event registration, unregistration, and triggering.
+/// </summary>
 public class EventBus : MonoBehaviour
 {
-    private readonly Dictionary<Type, List<IEventListener>> eventListeners = new();
+    private readonly Dictionary<Type, HashSet<Delegate>> eventListeners = new();
 
-    public void RegisterListener<T>(IEventListener listener) where T : IEventParameter
+    /// <inheritdoc/>
+    public void RegisterListener<T>(Action<T> listener) where T : IEventParameter
     {
         Type eventType = typeof(T);
-        if (!eventListeners.TryGetValue(eventType, out List<IEventListener> listeners))
+        if (!eventListeners.TryGetValue(eventType, out HashSet<Delegate> listeners))
         {
-            eventListeners.Add(eventType, new List<IEventListener>());
+            listeners = new HashSet<Delegate>();
+            eventListeners.Add(eventType, listeners);
         }
 
-        eventListeners[eventType].Add(listener);
+        listeners.Add(listener);
     }
 
-    public void UnregisterListener<T>(IEventListener listener) where T : IEventParameter
+    /// <inheritdoc/>
+    public void UnregisterListener<T>(Action<T> listener) where T : IEventParameter
     {
         Type eventType = typeof(T);
-        if (eventListeners.TryGetValue(eventType, out List<IEventListener> listeners))
+        if (eventListeners.TryGetValue(eventType, out HashSet<Delegate> listeners))
         {
             listeners.Remove(listener);
         }
     }
 
+    /// <inheritdoc/>
     public void TriggerEvent<T>(T eventParams) where T : IEventParameter
     {
         Type eventType = typeof(T);
-        if (eventListeners.TryGetValue(eventType, out List<IEventListener> listeners))
+        if (eventListeners.TryGetValue(eventType, out HashSet<Delegate> listeners))
         {
-            foreach (IEventListener listener in listeners)
+            foreach (var listener in listeners)
             {
-                listener.TriggerEvent(eventParams);
+                ((Action<T>)listener)?.Invoke(eventParams);
             }
         }
     }

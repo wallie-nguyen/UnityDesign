@@ -7,17 +7,19 @@ public class ExampleUsageEventBus : MonoBehaviour
     [SerializeField]
     private EventBus eventBus;
 
-    private StringEventListener myEventListener;
-
     private void Start()
     {
-        myEventListener = new();
-        eventBus.RegisterListener<StringEventParameter>(myEventListener);
+        eventBus.RegisterListener<StringEventParameter>(HandleString);
     }
 
     private void OnDestroy()
     {
-        eventBus.UnregisterListener<StringEventParameter>(myEventListener);
+        eventBus.UnregisterListener<StringEventParameter>(HandleString);
+    }
+
+    private void HandleString(StringEventParameter eventParams)
+    {
+
     }
 
     private void Update()
