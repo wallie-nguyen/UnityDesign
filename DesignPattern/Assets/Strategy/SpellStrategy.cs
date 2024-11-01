@@ -17,7 +17,7 @@ public class ShieldSpell : SpellStrategy
     }
 }
 
-public class Hero : MonoBehaviour
+public class HeroStrategy : MonoBehaviour
 {
     public SpellStrategy spellStrategy;
 
