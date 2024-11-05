@@ -11,3 +11,10 @@ public interface IVisitable
 {
     void Accept(IVisitor visitor);
 }
+
+public class MyVisitor : MonoBehaviour, IVisitor
+{
+    public void Visit<T>(T visitable) where T : Component, IVisitable
+    {
+    }
+}
