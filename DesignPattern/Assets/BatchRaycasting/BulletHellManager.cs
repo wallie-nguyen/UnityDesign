@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Jobs;
 using UnityEngine.Pool;
 
 public class BulletHellManager : MonoBehaviour
@@ -35,6 +36,8 @@ public class BulletHellManager : MonoBehaviour
     readonly List<Bullet> activeProjectiles = new List<Bullet>();
     readonly List<Bullet> bulletsToReturn = new List<Bullet>();
 
+    TransformAccessArray bulletTransforms;
+
     private void Start()
     {
         patternGenerator = new BulletPatternGenerator(new RadialPattern());
@@ -52,6 +55,19 @@ public class BulletHellManager : MonoBehaviour
             defaultCapacity: bulletCount,
             maxSize: bulletCount * 10
         );
+    }
+
+    private void Update()
+    {
+        // We don't have to dispose of the TransformAccessArray because it's a struct and will be disposed of automatically.
+        using (bulletTransforms = new TransformAccessArray(activeProjectiles.Count))
+        {
+            for (int i = 0; i < activeProjectiles.Count; i++)
+            {
+                Bullet bullet = activeProjectiles[i];
+                bulletTransforms.Add(bullet.transform);
+            }
+        }
     }
 
     private void LateUpdate()
